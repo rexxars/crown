@@ -18,6 +18,13 @@ npm install
 npm start
 ```
 
+## Developing
+
+```
+# Automatically restarts the server on changes
+npm run dev
+```
+
 ## License
 
 MIT-licensed. See LICENSE.
