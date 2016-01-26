@@ -1,4 +1,4 @@
-# crown ♚
+# crown ♛
 
 Microservice that scrapes websites, extracting key information such as title, description, opengraph information etc
 
