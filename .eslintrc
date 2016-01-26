@@ -1,0 +1,9 @@
+{
+  "extends": [
+    "bengler",
+    "bengler/react",
+    "bengler/legacy-overrides/base",
+    "bengler/legacy-overrides/react"
+  ],
+  "parser": "babel-eslint"
+}

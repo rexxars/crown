@@ -1,0 +1,45 @@
+{
+  "name": "crown",
+  "version": "1.0.0",
+  "description": "Microservice that scrapes websites, extracting key information such as title, description, opengraph information etc",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node --require babel-core/register src/server.js",
+    "lint": "eslint .",
+    "test": "ava",
+    "dev": "remon --require babel-core/register src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/bengler/crown.git"
+  },
+  "keywords": [
+    "crown",
+    "extract",
+    "scrape",
+    "metadata",
+    "microservice",
+    "api"
+  ],
+  "author": "Bengler AS",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bengler/crown/issues"
+  },
+  "homepage": "https://github.com/bengler/crown#readme",
+  "dependencies": {
+    "babel-eslint": "^5.0.0-beta6",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react": "^6.3.13",
+    "hapi": "^12.1.0",
+    "joi": "^7.2.2",
+    "request": "^2.67.0"
+  },
+  "devDependencies": {
+    "ava": "^0.11.0",
+    "eslint": "^1.10.3",
+    "eslint-config-bengler": "^0.5.4",
+    "eslint-plugin-react": "^3.16.1",
+    "remon": "^1.0.2"
+  }
+}
