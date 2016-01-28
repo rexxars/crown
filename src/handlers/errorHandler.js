@@ -1,10 +1,7 @@
-import Joi from 'joi'
 import Boom from 'boom'
-import request from '../request'
-import appConfig from '../../config/config'
 import {DisallowedHostError} from '../errors'
 
-const isNotHttpOk = res => res && res.statusCode >= 300
+export const isNotHttpOk = res => res && res.statusCode >= 300
 
 const handleHttpError = res => {
   switch (res.statusCode) {
@@ -20,11 +17,7 @@ const handleHttpError = res => {
   }
 }
 
-const handleSuccess = (res, body) => {
-  return {foo: 'bar'}
-}
-
-const handleError = (err, res, req) => {
+export const handleError = (err, res, req) => {
   if (isNotHttpOk(res)) {
     return handleHttpError(res)
   }
@@ -64,30 +57,3 @@ const handleError = (err, res, req) => {
   console.error('Unhandled error type', err) // eslint-disable-line
   return Boom.badImplementation('Unhandled error type')
 }
-
-const validateHandler = (req, reply) => {
-  request({
-    url: req.query.url,
-    maxRedirects: req.query.maxRedirects || 3,
-    followRedirect: req.query.maxRedirects > 0,
-    timeout: appConfig.timeout,
-    gzip: true
-  }, (err, res, body, httpRequest) => {
-    reply(
-      err || isNotHttpOk(res)
-      ? handleError(err, res, httpRequest)
-      : handleSuccess(res, body, httpRequest)
-    )
-  })
-}
-
-export const config = {
-  validate: {
-    query: {
-      url: Joi.string().required().uri({scheme: ['http', 'https']}),
-      maxRedirects: Joi.number().integer().min(0).max(10)
-    }
-  }
-}
-
-export default validateHandler

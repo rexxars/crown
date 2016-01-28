@@ -1,7 +1,7 @@
 import Hapi from 'hapi'
 import config from '../config/config'
-import resolve, {config as resolveConfig} from './controllers/resolve'
-import validate, {config as validateConfig} from './controllers/validate'
+import resolveHandler, {config as resolveConfig} from './handlers/resolveHandler'
+import validationHandler, {config as validateConfig} from './handlers/validationHandler'
 
 const server = new Hapi.Server()
 server.connection({
@@ -12,14 +12,14 @@ server.connection({
 server.route({
   method: 'GET',
   path: config.rootPath,
-  handler: resolve,
+  handler: resolveHandler,
   config: resolveConfig
 })
 
 server.route({
   method: 'GET',
   path: `${config.rootPath}/validate`,
-  handler: validate,
+  handler: validationHandler,
   config: validateConfig
 })
 
