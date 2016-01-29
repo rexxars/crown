@@ -1,4 +1,4 @@
-import request from 'request'
+import wreck from 'wreck'
 import userAgents from '../config/userAgents'
 import config from '../config/config'
 import {isPrivate} from 'hostname-is-private'
@@ -10,23 +10,32 @@ const getRandomUserAgent = () => userAgents[Math.floor(Math.random() * userAgent
 const defaultOptions = {
   headers: {
     'Accept-Language': 'en-US,en;q=0.8,nb;q=0.6,da;q=0.4',
-    Accept: 'accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept': 'accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
   }
 }
 
-const makeRequest = (opts, callback) => {
+const makeRequest = (method, url, opts, callback) => {
   const options = Object.assign({}, defaultOptions, opts)
   options.headers['User-Agent'] = getRandomUserAgent()
 
-  const httpRequest = request(opts, (err, res, body) => {
-    callback(err, res, body, httpRequest)
+  wreck.request(method, url, opts, (err, res) => {
+    if (err) {
+      return callback(err)
+    }
+
+    const readOpts = {
+      timeout: opts.timeout,
+      maxBytes: opts.maxBytes
+    }
+
+    wreck.read(res, readOpts, (readErr, body) => callback(readErr, res, body))
   })
 }
 
 const validateRequest = (opts, callback) => {
   // See if we have to resolve the hostname before we can do the request
   if (config.allowPrivateHostnames) {
-    return makeRequest(opts, callback)
+    return makeRequest(opts.method, opts.url, opts, callback)
   }
 
   const url = parseUrl(opts.url, false, true)
@@ -35,7 +44,7 @@ const validateRequest = (opts, callback) => {
       return callback(err || new DisallowedHostError('Host not allowed'))
     }
 
-    makeRequest(opts, callback)
+    makeRequest(opts.method, opts.url, opts, callback)
   })
 }
 

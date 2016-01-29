@@ -4,20 +4,18 @@ import appConfig from '../../config/config'
 import {handleError, isNotHttpOk} from './errorHandler'
 
 export const requestHandler = (method, handleSuccess) => (req, reply) => {
-  const maxRedirects = req.query.maxRedirects || 3
-
+  let resolvedUrl = req.query.url
   request({
     method: method,
     url: req.query.url,
-    maxRedirects: maxRedirects,
-    followRedirect: maxRedirects > 0,
+    redirects: req.query.maxRedirects || 3,
     timeout: appConfig.timeout,
-    gzip: true
-  }, (err, res, body, httpRequest) => {
+    redirected: (status, location) => resolvedUrl = location
+  }, (err, res, body) => {
     reply(
       err || isNotHttpOk(res)
-      ? handleError(err, res, httpRequest)
-      : handleSuccess(res, body, httpRequest)
+      ? handleError(err, res, resolvedUrl)
+      : handleSuccess(req, res, body, resolvedUrl)
     )
   })
 }

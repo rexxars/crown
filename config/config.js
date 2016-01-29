@@ -4,6 +4,7 @@ export default {
   port: process.env.PORT || 8000,
   rootPath: process.env.ROOT_PATH || '/api/crown/v1',
   timeout: process.env.TIMEOUT || 3000,
+  maxBytes: process.env.MAX_BYTES || 1048576, // 1 MB
   allowPrivateHostnames: boolify(process.env.ALLOW_PRIVATE_HOSTNAMES, false)
 }
 

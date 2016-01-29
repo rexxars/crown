@@ -1,9 +1,9 @@
 import {requestHandler, config as requestConfig} from './requestHandler'
 
-const handleSuccess = (res, body, req) => {
+const handleSuccess = (req, res, body, resolvedUrl) => {
   return {
     statusCode: res.statusCode,
-    resolvedUrl: req.uri.href
+    resolvedUrl: resolvedUrl
   }
 }
 
