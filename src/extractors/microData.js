@@ -6,4 +6,6 @@ const extractMicroData = (body, req, getParsedDoc, resolvedUrl) =>
     base: url.resolve(resolvedUrl, '/').replace(/\/$/, '')
   })
 
+extractMicroData.requiresDocumentBody = true
+
 export default extractMicroData
