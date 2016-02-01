@@ -5,7 +5,9 @@ export default {
   rootPath: process.env.ROOT_PATH || '/api/crown/v1',
   timeout: process.env.TIMEOUT || 3000,
   maxBytes: process.env.MAX_BYTES || 1048576, // 1 MB
-  allowPrivateHostnames: boolify(process.env.ALLOW_PRIVATE_HOSTNAMES, false)
+  allowPrivateHostnames: boolify(process.env.ALLOW_PRIVATE_HOSTNAMES, false),
+  memcached: process.env.MEMCACHED_HOSTS || '',
+  defaultCacheTtl: process.env.DEFAULT_CACHE_TTL || 120
 }
 
 function boolify(envVar, defValue) {

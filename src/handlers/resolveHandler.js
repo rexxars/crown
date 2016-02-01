@@ -1,6 +1,7 @@
 import Joi from 'joi'
 import cheerio from 'cheerio'
 import {memoize} from 'lodash'
+import cache from '../cache'
 import request from '../request'
 import appConfig from '../../config/config'
 import {handleError, isNotHttpOk} from './errorHandler'
@@ -19,7 +20,8 @@ const handleSuccess = (req, res, body, resolvedUrl) => {
   // If the string value `*` is in the extract array, treat it as "extract everything"
   const extractAll = req.query.extract.includes('*')
 
-  return extractorNames.reduce((reply, extractor) => {
+  // Reduce extractor values into one object for the response
+  const result = extractorNames.reduce((reply, extractor) => {
     // If the user has not enabled the extractor, don't call the extractor
     if (!extractAll && !req.query.extract.includes(extractor)) {
       return reply
@@ -33,6 +35,10 @@ const handleSuccess = (req, res, body, resolvedUrl) => {
     statusCode: res.statusCode,
     resolvedUrl: resolvedUrl
   })
+
+  // Store the results in cache
+  cache.set(`crown-${req.url.href}`, result, cache.ttl(res), () => {})
+  return result
 }
 
 const resolveHandler = (req, reply) => {
@@ -57,7 +63,17 @@ const resolveHandler = (req, reply) => {
   })
 }
 
-export default resolveHandler
+const cachedResolveHandler = (req, reply) => {
+  cache.get(`crown-${req.url.href}`, (ignore, data) => {
+    if (data) {
+      return reply(data)
+    }
+
+    resolveHandler(req, reply)
+  })
+}
+
+export default cachedResolveHandler
 
 export const config = {
   validate: {
