@@ -1,4 +1,5 @@
 {
   "presets": ["es2015", "react"],
-  "plugins": ["array-includes"]
+  "plugins": ["array-includes"],
+  "sourceMaps": "inline"
 }

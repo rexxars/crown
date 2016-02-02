@@ -84,11 +84,9 @@ export const config = {
         session: Joi.string(),
         extract: Joi.array()
           .single()
-          .items(Joi.string().allow(extractorNames).allow('*'))
+          .items(Joi.string().valid(extractorNames).allow('*'))
           .default(['meta', 'openGraph'])
       })
-      .nand('extract[]', 'extract')
-      .rename('extract[]', 'extract', {override: true, ignoreUndefined: true, alias: true})
   },
   plugins: {
     checkpoint: {

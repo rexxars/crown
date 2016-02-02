@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Beginning Assembly Programming on the Commodore Vic-20</title>
+  <meta charset="utf-8" />
+
+  <meta name="description" content="Retro Computers, Programming, General Technical Tinkering"/>
+  <meta name="keywords" content="Retro Vintage Programming Tinkering"/>
+
+  <link rel="stylesheet" href="/css/sitestyle.css" media="screen" type="text/css" />
+  <link rel="stylesheet" href="/css/html_pygments.css" media="screen" type="text/css" />
+
+  <link rel="alternate" type="application/rss+xml" title="Techtinkering RSS Feed" href="http://feedproxy.google.com/TechTinkering" />
+</head>
+
+<body>
+
+  <div class="container">
+
+    <nav class="banner">
+      <a class="brand" href="/">TechTinkering</a>
+
+      <ul>
+        <li
+        
+        ><a href="/">Home</a></li>
+
+        <li
+        
+        ><a href="/archive">Archive</a></li>
+
+        
+        <li class="active"><a href="">Article</a></li>
+        
+
+        
+
+        
+
+        
+
+        
+
+        <li
+        
+        ><a href="/about">About</a></li>
+
+      </ul>
+
+      <a href="http://feedproxy.google.com/TechTinkering" title="Subscribe to TechTinkering's RSS Feed">
+        <img class="bannerIcon" src="/images/feed-icon-28x28.png" alt="RSS Feed"/>
+      </a>
+
+      <!-- From: http://www.buttonshut.com/Get-Button-Huts-Code/Youtube-Buttons-831.html -->
+      <a href="http://youtube.com/techtinkering" title="TechTinkering's YouTube Channel">
+        <img class="bannerIcon" src="/images/youtube-small-square-32.png" alt="YouTube Channel"/>
+      </a>
+
+      <!-- From: http://www.buttonshut.com/Get-Button-Huts-Code/Twitter-Buttons-1124.html -->
+      <a href="http://twitter.com/TechTinkering" title="@TechTinkering on Twitter">
+        <img class="bannerIcon" src="/images/twitter-button-36.png" alt="@techtinkering on Twitter"/>
+      </a>
+
+
+      <!-- From: http://www.graphicsfuel.com/2011/05/email-icon-psd/ -->
+      <a href="mailto:feedback@techtinkering.com" title="Email us, we'd love to hear from you">
+        <img class="bannerIcon" src="/images/email.png" alt="Email"/>
+      </a>
+
+      <a href="https://github.com/lawrencewoodman/techtinkering.com" title="Fork TechTinkering On Github ">
+        <img class="bannerIcon" src="/images/octocat_fluid.png" alt="Techtinkering Repo on  Github"/>
+      </a>
+    </nav>
+
+    <div class="content">
+      <div class="rightColumn">
+
+  <h2>Latest Articles</h2>
+  <ul class="briefPosts">
+    
+      <li><a href="/2014/06/22/how-to-make-thunderbird-feel-like-geary">How to Make Thunderbird Feel Like Geary</a></li>
+    
+      <li><a href="/2014/04/19/beware-of-immutable-lists-for-fsharp-parallel-processing">Beware of Immutable Lists for F# Parallel Processing</a></li>
+    
+      <li><a href="/2013/08/29/rendering-racket-package-scribblings-on-github-using-gh-pages">Rendering Racket Package Scribblings on Github Using gh-pages</a></li>
+    
+      <li><a href="/2013/05/29/programmable-character-sets-a-simple-alternative-to-bitmap-displays">Programmable Character Sets: A Simple Alternative to Bitmap Displays</a></li>
+    
+      <li><a href="/2013/05/10/adding-a-basic-stub-to-a-vic-20-assembly-language-program">Adding a Basic Stub to a Vic-20 Assembly Language Program</a></li>
+    
+  </ul>
+
+</div>
+
+<div class="leftColumn">
+  <article itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <h1 itemprop="name"><a href="/2013/04/16/beginning-assembly-programming-on-the-commodore-vic-20" title="Beginning Assembly Programming on the Commodore Vic-20">Beginning Assembly Programming on the Commodore Vic-20</a></h1>
+    <span class="byLine">
+      by <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+           <a rel="author" itemprop="url" class="author" href="/profile/lawrencewoodman/">
+             <span itemprop="name">Lawrence Woodman</span>
+           </a>
+         </span>
+      <time itemprop="datePublished" datetime="2013-04-16">
+        16 April 2013
+      </time>
+    </span>
+
+
+    <!-- AddThis Button BEGIN -->
+    <div style="float: right;" class="addthis_toolbox addthis_default_style addthis_32x32_style">
+    <a class="addthis_button_google_plusone" g:plusone:count="false"></a>
+    <a class="addthis_button_facebook"></a>
+    <a class="addthis_button_twitter"></a>
+    <a class="addthis_button_reddit"></a>
+    <a class="addthis_button_compact"></a>
+    </div>
+    <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=vlifesystems"></script>
+    <!-- AddThis Button END -->
+
+    <span class="tagLine">
+      <br />
+      Tags:
+      
+        <a rel="tag" href="/tag/programming">Programming</a> &nbsp; &nbsp;
+      
+        <a rel="tag" href="/tag/retro">Retro</a> &nbsp; &nbsp;
+      
+        <a rel="tag" href="/tag/tutorial">Tutorial</a> &nbsp; &nbsp;
+      
+        <a rel="tag" href="/tag/commodore">Commodore</a> &nbsp; &nbsp;
+      
+        <a rel="tag" href="/tag/vic-20">Vic-20</a> &nbsp; &nbsp;
+      
+        <a rel="tag" href="/tag/assembly">Assembly</a> &nbsp; &nbsp;
+      
+    </span>
+
+  </header>
+
+  <div class="articleBody" itemprop="articleBody">
+    <p>The Commodore Vic-20 is a great machine to learn an assembly language on.  It was released in 1981 and was the first computer to sell one million units, which contributes to its popularity today.  The machine is well documented, well supported through forums and much of the hardware is plentiful and quite cheap.  The <a href="http://en.wikipedia.org/wiki/6502">6502</a> has a smaller instruction set than the <a href="http://en.wikipedia.org/wiki/Z80">Z80</a> for example and the Vic-20, because of it's limited power, doesn't take long to learn most things about it.  This is ideal for busy people who can only afford to spend so much time exploring.</p>
+
+<p>Here I will show you how to get started programming the Vic-20 in assembly language.  I will not be teaching 6502 assembly language itself as there are better resources available and I will link to these.  I will, however, be showing you what you need to get started, where some of the best resources are and I will be giving a few examples to whet your appetite.</p>
+
+<h2>Assembly Language</h2>
+
+<p>Assembly language is a mnemonic representation of the computers underlying machine language.  It allows you to represent the following machine language in <a href="http://en.wikipedia.org/wiki/Hexadecimal">hexadecimal</a> octets:</p>
+
+<pre><code>A9 93 20 D2 FF 00
+</code></pre>
+
+<p>as assembly language (with comments to explain what is happening)</p>
+
+<pre><code>LDA #$93   ; Load the Accumulator register (A storage location in the CPU)
+           ; with the value $93, which is the Clear Screen code
+JSR $FFD2  ; Jump to a subroutine at location $FFD2 (Print a character routine).
+BRK        ; Break out of the program.
+</code></pre>
+
+<p>One you get used to 6502 assembly language you will be able to read it much easier than machine language.  That said, you will naturally become familiar with the machine language as well when you are debugging and inspecting memory.  So you will easily spot BRK ($00) or JSR ($20) instructions.  This familiarity gives you a much closer connection to the machine and ultimately allows you to fine tune your programs to get the most out it.</p>
+  </div>
+</article>
+
+
+  <div style="clear: left;"></div>
+
+  
+    <hr />
+    <a rel="license" href="http://creativecommons.org/licenses/by/2.0/uk/">
+      <img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/2.0/uk/88x31.png" />
+    </a>
+    <span xmlns:dc="http://purl.org/dc/elements/1.1/" href="http://purl.org/dc/dcmitype/Text" property="dc:title" rel="dc:type">
+      Beginning Assembly Programming on the Commodore Vic-20
+    </span><br />
+
+    by
+    <a xmlns:cc="http://creativecommons.org/ns#" href="http://techtinkering.com/2013/04/16/beginning-assembly-programming-on-the-commodore-vic-20" property="cc:attributionName" rel="cc:attributionURL">
+    TechTinkering
+    </a>
+     is licensed under a
+    <a rel="license" href="http://creativecommons.org/licenses/by/2.0/uk/">
+    Creative Commons Attribution 2.0 UK: England & Wales License
+    </a>
+  
+  <hr style="clear:both;" />
+
+</div>
+
+    </div>
+
+    <footer>
+      <strong>Legal:</strong> &nbsp;
+      <a href="/tandc/">Terms</a>,
+      <a href="/statinfo/">Statutory Information</a>
+
+      &nbsp; &nbsp;
+      <strong>RSS Feeds:</strong> &nbsp;
+      <a href="http://feedproxy.google.com/TechTinkering" title="Subscribe to TechTinkering's RSS Feed">Full</a>,
+      <a href="http://feeds.feedburner.com/Retro-Techtinkering" title="Subscribe to TechTinkering's Retro RSS Feed">Retro</a>
+    </footer>
+  </div>
+
+  </body>
+</html>

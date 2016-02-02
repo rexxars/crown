@@ -1,5 +1,5 @@
 /* eslint-disable no-process-env */
-export default {
+const defaultConfig = {
   // Core server configuraton
   host: process.env.HOST || '0.0.0.0',
   port: process.env.PORT || 8000,
@@ -22,6 +22,13 @@ export default {
   useCheckpoint: boolify(process.env.CHECKPOINT, false),
   pebblesHost: process.env.PEBBLE_HOST // Only used if `useCheckpoint` is true
 }
+
+export default defaultConfig
+export const testConfig = Object.assign({}, defaultConfig, {
+  timeout: 250,
+  maxBytes: 262144,
+  allowPrivateHostnames: true
+})
 
 function boolify(envVar, defValue) {
   if (typeof envVar === 'undefined') {

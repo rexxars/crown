@@ -2,12 +2,13 @@
   "name": "crown",
   "version": "1.0.0",
   "description": "Microservice that scrapes websites, extracting key information such as title, description, opengraph information etc",
-  "main": "src/server.js",
+  "main": "src/crown.js",
   "scripts": {
-    "start": "node --require babel-core/register src/server.js",
+    "dev": "remon --require babel-core/register src/crown.js",
     "lint": "eslint .",
-    "test": "ava",
-    "dev": "remon --require babel-core/register src/server.js"
+    "posttest": "npm run lint",
+    "start": "node --require babel-core/register src/crown.js",
+    "test": "nyc --reporter=lcov --reporter=text ava"
   },
   "repository": {
     "type": "git",
@@ -50,6 +51,13 @@
     "eslint": "^1.10.3",
     "eslint-config-bengler": "^0.5.5",
     "eslint-plugin-react": "^3.16.1",
+    "nyc": "^5.5.0",
     "remon": "^1.0.2"
+  },
+  "ava": {
+    "verbose": true,
+    "require": [
+      "babel-core/register"
+    ]
   }
 }
