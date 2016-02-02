@@ -81,6 +81,7 @@ export const config = {
       .keys({
         url: Joi.string().required().uri({scheme: ['http', 'https']}),
         maxRedirects: Joi.number().integer().min(0).max(10),
+        session: Joi.string(),
         extract: Joi.array()
           .single()
           .items(Joi.string().allow(extractorNames).allow('*'))

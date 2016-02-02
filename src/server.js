@@ -3,7 +3,17 @@ import config from '../config/config'
 import resolveHandler, {config as resolveConfig} from './handlers/resolveHandler'
 import checkpoint from './plugins/checkpoint'
 
-const server = new Hapi.Server()
+const server = new Hapi.Server({
+  connections: {
+    routes: {
+      cors: {
+        origin: config.corsOrigins.split(',').map(str => str.trim()).filter(Boolean),
+        maxAge: config.corsMaxAge
+      }
+    }
+  }
+})
+
 server.connection({
   host: config.host,
   port: config.port

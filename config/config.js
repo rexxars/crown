@@ -10,6 +10,10 @@ export default {
   maxBytes: process.env.MAX_BYTES || 1048576, // 1 MB
   allowPrivateHostnames: boolify(process.env.ALLOW_PRIVATE_HOSTNAMES, false),
 
+  // CORS (Cross-Origin Resource Sharing)
+  corsOrigins: process.env.CORS_ORIGINS || '*',
+  corsMaxAge: process.env.CORS_MAX_AGE || 86400,
+
   // Caching
   memcached: process.env.MEMCACHED_HOSTS || '',
   defaultCacheTtl: process.env.DEFAULT_CACHE_TTL || 120,
