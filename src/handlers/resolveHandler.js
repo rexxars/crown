@@ -88,5 +88,10 @@ export const config = {
       })
       .nand('extract[]', 'extract')
       .rename('extract[]', 'extract', {override: true, ignoreUndefined: true, alias: true})
+  },
+  plugins: {
+    checkpoint: {
+      requireSession: true // only used if checkpoint is enabled in configuration
+    }
   }
 }

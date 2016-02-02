@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/bengler/crown#readme",
   "dependencies": {
+    "@bengler/pebbles-client": "github:bengler/pebbles-client.js",
     "babel-eslint": "^5.0.0-beta6",
     "babel-plugin-array-includes": "^2.0.3",
     "babel-preset-es2015": "^6.3.13",

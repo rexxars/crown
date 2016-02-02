@@ -1,12 +1,17 @@
 import Hapi from 'hapi'
 import config from '../config/config'
 import resolveHandler, {config as resolveConfig} from './handlers/resolveHandler'
+import checkpoint from './plugins/checkpoint'
 
 const server = new Hapi.Server()
 server.connection({
   host: config.host,
   port: config.port
 })
+
+if (config.useCheckpoint) {
+  server.register({register: checkpoint})
+}
 
 server.route({
   method: 'GET',
