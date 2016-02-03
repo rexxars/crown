@@ -14,10 +14,7 @@ const handleHttpError = res => {
 
   switch (res.statusCode) {
     case 301:
-      return Boom.badRequest(
-        'Reached maximum number of redirects without resolving',
-        {lastLocation: res.headers.Location}
-      )
+      return Boom.create(508, 'Reached maximum number of redirects without resolving')
     case 404:
       return Boom.notFound('Remote server responded with a 404')
     default:
@@ -64,10 +61,7 @@ const handleUncaughtError = err => {
   }
 
   if (err.message.includes('Maximum redirections')) {
-    return Boom.badRequest(
-      'Reached maximum number of redirects without resolving',
-      {lastLocation: err.data[err.data.length - 1]}
-    )
+    return Boom.create(508, 'Reached maximum number of redirects without resolving')
   }
 
   console.error('Unhandled error type', err) // eslint-disable-line

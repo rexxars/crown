@@ -54,8 +54,8 @@ test.cb('stops after max number of redirects', t => {
 
     server.inject(`${baseUrl}?${qs({url})}`, res => {
       const doc = parse(res)
-      t.is(res.statusCode, 400, 'status code should be 400')
-      t.is(doc.statusCode, 400, 'status code should be 400')
+      t.is(res.statusCode, 508, 'status code should be 508')
+      t.is(doc.statusCode, 508, 'status code should be 508')
       t.is(doc.message, 'Reached maximum number of redirects without resolving')
       fixture.close()
       t.end()
