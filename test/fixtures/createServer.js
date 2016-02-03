@@ -7,7 +7,7 @@ module.exports = (fn, type, cb) => {
     .createServer(fn)
     .listen(0)
     .on('listening', () => {
-      cb(null, server.address().port)
+      cb(null, `http://localhost:${server.address().port}`)
     })
 
   return server

@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "posttest": "npm run lint",
     "start": "node --require babel-core/register src/crown.js",
-    "test": "nyc --reporter=lcov --reporter=text ava"
+    "test": "TEST=1 nyc --reporter=lcov --reporter=text ava"
   },
   "repository": {
     "type": "git",

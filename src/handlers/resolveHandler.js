@@ -3,7 +3,6 @@ import cheerio from 'cheerio'
 import {memoize} from 'lodash'
 import cache from '../cache'
 import request from '../request'
-import appConfig from '../../config/config'
 import {handleError, isNotHttpOk} from './errorHandler'
 import openGraph from '../extractors/openGraph'
 import microData from '../extractors/microData'
@@ -13,67 +12,73 @@ import meta from '../extractors/meta'
 const extractors = {meta, openGraph, appLinks, microData}
 const extractorNames = Object.keys(extractors)
 
-const handleSuccess = (req, res, body, resolvedUrl) => {
-  // Memoize to allow lazy-parsing, yet be efficient when multiple extractors need it
-  const getParsedDocument = memoize(() => cheerio.load(body))
+const getResolveHandler = config => {
+  const handleSuccess = (req, res, body, resolvedUrl) => {
+    // Memoize to allow lazy-parsing, yet be efficient when multiple extractors need it
+    const getParsedDocument = memoize(() => cheerio.load(body))
 
-  // If the string value `*` is in the extract array, treat it as "extract everything"
-  const extractAll = req.query.extract.includes('*')
+    // If the string value `*` is in the extract array, treat it as "extract everything"
+    const extractAll = req.query.extract.includes('*')
 
-  // Reduce extractor values into one object for the response
-  const result = extractorNames.reduce((reply, extractor) => {
-    // If the user has not enabled the extractor, don't call the extractor
-    if (!extractAll && !req.query.extract.includes(extractor)) {
+    // Reduce extractor values into one object for the response
+    const result = extractorNames.reduce((reply, extractor) => {
+      // If the user has not enabled the extractor, don't call the extractor
+      if (!extractAll && !req.query.extract.includes(extractor)) {
+        return reply
+      }
+
+      // Assign a key in the response with the same name as the extractor, populating
+      // the value with a promise which will be resolved once completed
+      reply[extractor] = extractors[extractor](body, req, getParsedDocument, resolvedUrl)
       return reply
-    }
+    }, {
+      statusCode: res.statusCode,
+      resolvedUrl: resolvedUrl
+    })
 
-    // Assign a key in the response with the same name as the extractor, populating
-    // the value with a promise which will be resolved once completed
-    reply[extractor] = extractors[extractor](body, req, getParsedDocument, resolvedUrl)
-    return reply
-  }, {
-    statusCode: res.statusCode,
-    resolvedUrl: resolvedUrl
-  })
+    // Store the results in cache
+    cache.set(`crown-${req.url.href}`, result, cache.ttl(res), () => {})
+    return result
+  }
 
-  // Store the results in cache
-  cache.set(`crown-${req.url.href}`, result, cache.ttl(res), () => {})
-  return result
+  const resolveHandler = (req, reply) => {
+    // If the string value `*` is in the extract array, treat it as "extract everything"
+    const usedExtractors = req.query.extract.includes('*') ? extractorNames : req.query.extract
+    const requiresBody = usedExtractors.some(extractor => extractors[extractor].requiresDocumentBody)
+
+    let resolvedUrl = req.query.url
+    request({
+      method: 'GET',
+      url: req.query.url,
+      redirects: req.query.maxRedirects || 3,
+      requiresBody: requiresBody,
+      timeout: config.timeout,
+      maxBytes: config.maxBytes,
+      allowPrivateHostnames: config.allowPrivateHostnames,
+      redirected: (status, location) => resolvedUrl = location
+    }, (err, res, body) => {
+      reply(
+        err || isNotHttpOk(res)
+        ? handleError(err, res, resolvedUrl)
+        : handleSuccess(req, res, body, resolvedUrl)
+      )
+    })
+  }
+
+  const cachedResolveHandler = (req, reply) => {
+    cache.get(`crown-${req.url.href}`, (ignore, data) => {
+      if (data) {
+        return reply(data)
+      }
+
+      resolveHandler(req, reply)
+    })
+  }
+
+  return cachedResolveHandler
 }
 
-const resolveHandler = (req, reply) => {
-  // If the string value `*` is in the extract array, treat it as "extract everything"
-  const usedExtractors = req.query.extract.includes('*') ? extractorNames : req.query.extract
-  const requiresBody = usedExtractors.some(extractor => extractors[extractor].requiresDocumentBody)
-
-  let resolvedUrl = req.query.url
-  request({
-    method: 'GET',
-    url: req.query.url,
-    redirects: req.query.maxRedirects || 3,
-    timeout: appConfig.timeout,
-    requiresBody: requiresBody,
-    redirected: (status, location) => resolvedUrl = location
-  }, (err, res, body) => {
-    reply(
-      err || isNotHttpOk(res)
-      ? handleError(err, res, resolvedUrl)
-      : handleSuccess(req, res, body, resolvedUrl)
-    )
-  })
-}
-
-const cachedResolveHandler = (req, reply) => {
-  cache.get(`crown-${req.url.href}`, (ignore, data) => {
-    if (data) {
-      return reply(data)
-    }
-
-    resolveHandler(req, reply)
-  })
-}
-
-export default cachedResolveHandler
+export default getResolveHandler
 
 export const config = {
   validate: {

@@ -16,7 +16,7 @@ const noop = (...args) => {
 }
 
 const ttl = res => {
-  const cc = Wreck.parseCacheControl(res.headers['cache-control']) || {}
+  const cc = Wreck.parseCacheControl(res.headers['cache-control'] || '') || {}
   return cc['s-max-age'] || cc['max-age'] || appConfig.defaultCacheTtl
 }
 

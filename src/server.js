@@ -1,5 +1,5 @@
 import Hapi from 'hapi'
-import resolveHandler, {config as resolveConfig} from './handlers/resolveHandler'
+import getResolveHandler, {config as resolveConfig} from './handlers/resolveHandler'
 import checkpoint from './plugins/checkpoint'
 
 const initServer = config => {
@@ -26,7 +26,7 @@ const initServer = config => {
   server.route({
     method: 'GET',
     path: config.rootPath,
-    handler: resolveHandler,
+    handler: getResolveHandler(config),
     config: resolveConfig
   })
 

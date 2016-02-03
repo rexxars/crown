@@ -23,12 +23,13 @@ const defaultConfig = {
   pebblesHost: process.env.PEBBLE_HOST // Only used if `useCheckpoint` is true
 }
 
-export default defaultConfig
-export const testConfig = Object.assign({}, defaultConfig, {
+const config = process.env.TEST ? Object.assign({}, defaultConfig, {
   timeout: 250,
   maxBytes: 262144,
   allowPrivateHostnames: true
-})
+}) : defaultConfig
+
+export default config
 
 function boolify(envVar, defValue) {
   if (typeof envVar === 'undefined') {

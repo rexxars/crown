@@ -3,7 +3,6 @@ import wreck from 'wreck'
 import once from 'lodash/once'
 import {isPrivate} from 'hostname-is-private'
 import userAgents from '../config/userAgents'
-import config from '../config/config'
 import {
   DisallowedHostError,
   RequestTimeoutError,
@@ -97,7 +96,7 @@ const makeRequest = (method, url, opts, callback) => {
 
 const validateRequest = (opts, callback) => {
   // See if we have to resolve the hostname before we can do the request
-  if (config.allowPrivateHostnames) {
+  if (opts.allowPrivateHostnames) {
     return makeRequest(opts.method, opts.url, opts, callback)
   }
 

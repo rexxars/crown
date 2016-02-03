@@ -1,5 +1,6 @@
 {
   "presets": ["es2015", "react"],
   "plugins": ["array-includes"],
-  "sourceMaps": "inline"
+  "sourceMaps": "inline",
+  "ignore": ["node_modules/*"]
 }
