@@ -11,102 +11,84 @@ import timeoutServer from './fixtures/timeoutServer'
 const server = initServer(config)
 const baseUrl = config.rootPath
 const parse = res => JSON.parse(res.payload)
+const getUrl = srv => `http://localhost:${srv.address().port}`
 
-test.cb('provides helpful root-level route', t => {
-  server.inject('/', res => {
+test('provides helpful root-level route', t =>
+  server.inject('/').then(res => {
     t.is(res.statusCode, 404, 'status code should be 404')
     t.is(parse(res).error, 'Not Found (did you mean /api/crown/v1?)')
-    t.end()
-  })
-})
+  }))
 
-test.cb('requires a URL query param', t => {
+test('requires a URL query param', t =>
   server.inject(baseUrl, res => {
     t.is(res.statusCode, 400, 'status code should be 400')
     t.same(parse(res).validation, {source: 'query', keys: ['url']})
-    t.end()
-  })
-})
+  }))
 
-test.cb('extracts meta and opengraph info by default', t => {
-  const fixture = successServer((err, url) => {
-    t.ifError(err)
-
-    server.inject(`${baseUrl}?${qs({url})}`, res => {
+test('extracts meta and opengraph info by default', t =>
+  successServer().then(fixture =>
+    server.inject(`${baseUrl}?${qs({url: getUrl(fixture)})}`).then(res => {
       const doc = parse(res)
       t.is(res.statusCode, 200, 'status code should be 200')
       t.is(doc.statusCode, 200, 'status code should be 200')
-      t.is(doc.resolvedUrl, url)
+      t.is(doc.resolvedUrl, getUrl(fixture))
       t.is(doc.meta.title, 'Beginning Assembly Programming on the Commodore Vic-20')
       t.is(doc.meta.description, 'Retro Computers, Programming, General Technical Tinkering')
       t.is(doc.openGraph.description, 'Retro Computers, Programming, General Technical Tinkering')
       t.is(doc.openGraph.url, 'http://techtinkering.com/2013/04/16/beginning-assembly-programming-on-the-commodore-vic-20/')
 
       fixture.close()
-      t.end()
     })
-  })
-})
+  )
+)
 
-test.cb('stops after max number of redirects', t => {
-  const fixture = infiniteRedirectServer((err, url) => {
-    t.ifError(err)
-
-    server.inject(`${baseUrl}?${qs({url})}`, res => {
+test('stops after max number of redirects', t =>
+  infiniteRedirectServer().then(fixture =>
+    server.inject(`${baseUrl}?${qs({url: getUrl(fixture)})}`, res => {
       const doc = parse(res)
       t.is(res.statusCode, 508, 'status code should be 508')
       t.is(doc.statusCode, 508, 'status code should be 508')
       t.is(doc.message, 'Reached maximum number of redirects without resolving')
       fixture.close()
-      t.end()
     })
-  })
-})
+  )
+)
 
-test.cb('handles redirects within limit', t => {
-  const fixture = redirectServer((err, url) => {
-    t.ifError(err)
-
-    server.inject(`${baseUrl}?${qs({url})}`, res => {
+test('handles redirects within limit', t =>
+  redirectServer().then(fixture =>
+    server.inject(`${baseUrl}?${qs({url: getUrl(fixture)})}`, res => {
       const doc = parse(res)
       t.is(res.statusCode, 200, 'status code should be 200')
       t.is(doc.statusCode, 200, 'status code should be 200')
-      t.is(doc.resolvedUrl, `${url}/home`)
+      t.is(doc.resolvedUrl, `${getUrl(fixture)}/home`)
       fixture.close()
-      t.end()
     })
-  })
-})
+  )
+)
 
-test.cb('cuts responses at size limit', t => {
-  const fixture = largeBodyServer((err, url) => {
-    t.ifError(err)
-
-    server.inject(`${baseUrl}?${qs({url})}`, res => {
+test('cuts responses at size limit', t =>
+  largeBodyServer().then(fixture =>
+    server.inject(`${baseUrl}?${qs({url: getUrl(fixture)})}`, res => {
       const doc = parse(res)
       t.is(res.statusCode, 406, 'status code should be 406')
       t.is(doc.statusCode, 406, 'status code should be 406')
       t.is(doc.message, 'Response exceeded max allowed number of bytes')
       fixture.close()
-      t.end()
     })
-  })
-})
+  )
+)
 
-test.cb('cuts responses at timeout', t => {
-  const fixture = timeoutServer((err, url) => {
-    t.ifError(err)
-
-    server.inject(`${baseUrl}?${qs({url})}`, res => {
+test('cuts responses at timeout', t =>
+  timeoutServer().then(fixture =>
+    server.inject(`${baseUrl}?${qs({url: getUrl(fixture)})}`, res => {
       const doc = parse(res)
       t.is(res.statusCode, 503, 'status code should be 503')
       t.is(doc.statusCode, 503, 'status code should be 503')
       t.is(doc.message, 'Read timeout while fetching URL')
       fixture.close()
-      t.end()
     })
-  })
-})
+  )
+)
 
 test('does not allow connections to local hosts', t => {
   const tmpServer = initServer(Object.assign({}, config, {allowPrivateHostnames: false}))
