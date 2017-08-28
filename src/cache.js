@@ -1,6 +1,6 @@
-import Wreck from 'wreck'
-import Memcached from 'memcached'
-import appConfig from '../config/config'
+const Wreck = require('wreck')
+const Memcached = require('memcached')
+const appConfig = require('../config/config')
 
 const hosts = appConfig.memcached.split(',').map(host => host.trim()).filter(Boolean)
 const hasCache = hosts.length > 0
@@ -20,7 +20,7 @@ const ttl = res => {
   return cc['s-max-age'] || cc['max-age'] || appConfig.defaultCacheTtl
 }
 
-export default {
+module.exports = {
   set: hasCache ? cache.set.bind(cache) : noop,
   get: hasCache ? cache.get.bind(cache) : noop,
   ttl: ttl

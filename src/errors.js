@@ -1,5 +1,9 @@
-import ExtendableError from 'es6-error'
+const ExtendableError = require('es6-error')
 
-export class DisallowedHostError extends ExtendableError {}
-export class RequestTimeoutError extends ExtendableError {}
-export class MaxAllowedBytesExceededError extends ExtendableError {}
+class DisallowedHostError extends ExtendableError {}
+class RequestTimeoutError extends ExtendableError {}
+class MaxAllowedBytesExceededError extends ExtendableError {}
+
+exports.DisallowedHostError = DisallowedHostError
+exports.RequestTimeoutError = RequestTimeoutError
+exports.MaxAllowedBytesExceededError = MaxAllowedBytesExceededError

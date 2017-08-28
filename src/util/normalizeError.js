@@ -1,15 +1,15 @@
-import Boom from 'boom'
-import {
+const Boom = require('boom')
+const {
   DisallowedHostError,
   MaxAllowedBytesExceededError,
   RequestTimeoutError
-} from '../errors'
+} = require('../errors')
 
-export const isNotHttpOk = res => res && res.statusCode >= 300
+const isNotHttpOk = res => res && res.statusCode >= 300
 
 const handleHttpError = res => {
-  if (!isNotHttpOk(res)) {
-    return null
+  if (!res || !isNotHttpOk(res)) {
+    return undefined
   }
 
   switch (res.statusCode) {
@@ -34,7 +34,7 @@ const handleNodeError = err => {
     case 'ECONNREFUSED':
       return Boom.badGateway('Remote host refused the connection attempt')
     default:
-      // Intentional fall-through
+      return undefined
   }
 }
 
@@ -51,6 +51,8 @@ const handleCrownError = err => {
   if (err instanceof RequestTimeoutError) {
     return Boom.serverTimeout(err.message)
   }
+
+  return undefined
 }
 
 const handleUncaughtError = err => {
@@ -60,7 +62,7 @@ const handleUncaughtError = err => {
     return Boom.badGateway('Unable to parse response from remote server')
   }
 
-  if (err.message.includes('Maximum redirections')) {
+  if (err.message.includes('redirects exceeded')) {
     return Boom.create(508, 'Reached maximum number of redirects without resolving')
   }
 
@@ -68,9 +70,19 @@ const handleUncaughtError = err => {
   return Boom.badImplementation('Unhandled error type')
 }
 
-export const handleError = (err, res, req) => (
-  handleHttpError(res)
-  || handleNodeError(err)
-  || handleCrownError(err)
-  || handleUncaughtError(err)
-)
+const handleBoomError = err => {
+  if (err.isBoom) {
+    return err
+  }
+
+  return undefined
+}
+
+const normalizeError = (err, res) =>
+  handleHttpError(res) ||
+  handleBoomError(err) ||
+  handleNodeError(err) ||
+  handleCrownError(err) ||
+  handleUncaughtError(err)
+
+module.exports = normalizeError

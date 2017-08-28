@@ -1,6 +1,6 @@
-import {camelCase} from 'lodash'
+const {camelCase} = require('lodash')
 
-const extractOpenGraph = (body, req, getParsedDoc) => {
+const extractOpenGraph = (response, getParsedDoc) => {
   const doc = getParsedDoc()
 
   const ogProps = {}
@@ -14,4 +14,4 @@ const extractOpenGraph = (body, req, getParsedDoc) => {
   return ogProps
 }
 
-export default extractOpenGraph
+module.exports = extractOpenGraph

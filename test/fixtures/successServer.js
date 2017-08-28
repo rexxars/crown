@@ -1,8 +1,12 @@
-import createServer from './createServer'
-import {readFileSync} from 'fs'
-import {join} from 'path'
+const {join} = require('path')
+const {readFileSync} = require('fs')
+const createServer = require('./createServer')
 
-export default cb =>
-  createServer((req, res) => {
-    res.write(readFileSync(join(__dirname, 'example-doc.html')))
-  }, 'http', cb)
+module.exports = cb =>
+  createServer(
+    (req, res) => {
+      res.write(readFileSync(join(__dirname, 'example-doc.html')))
+    },
+    'http',
+    cb
+  )

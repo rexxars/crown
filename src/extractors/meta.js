@@ -1,17 +1,14 @@
-import {camelCase} from 'lodash'
+const {camelCase} = require('lodash')
 
-const whitelist = [
-  'title',
-  'description'
-]
+const whitelist = ['title', 'description']
 
-const extractMeta = (body, req, getParsedDoc) => {
+const extractMeta = (response, getParsedDoc) => {
   const doc = getParsedDoc()
 
   const metaProps = {}
   doc.root().find('meta').each((i, item) => {
     const el = doc(item)
-    const key = (el.attr('name') || el.attr('property'))
+    const key = el.attr('name') || el.attr('property')
 
     if (whitelist.includes(key)) {
       metaProps[camelCase(key)] = el.attr('content')
@@ -23,4 +20,4 @@ const extractMeta = (body, req, getParsedDoc) => {
   return metaProps
 }
 
-export default extractMeta
+module.exports = extractMeta

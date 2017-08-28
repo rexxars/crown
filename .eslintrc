@@ -1,9 +1,5 @@
 {
-  "extends": [
-    "bengler",
-    "bengler/react",
-    "bengler/legacy-overrides/base",
-    "bengler/legacy-overrides/react"
-  ],
-  "parser": "babel-eslint"
+  "extends": ["sanity", "prettier"],
+  "env": {"node": true, "browser": false},
+  "parserOptions": {"ecmaVersion": 2017}
 }

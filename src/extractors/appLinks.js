@@ -1,6 +1,6 @@
-import {camelCase} from 'lodash'
+const {camelCase} = require('lodash')
 
-const extractAppLinks = (body, req, getParsedDoc) => {
+const extractAppLinks = (response, getParsedDoc) => {
   const doc = getParsedDoc()
 
   const alProps = {}
@@ -14,4 +14,4 @@ const extractAppLinks = (body, req, getParsedDoc) => {
   return alProps
 }
 
-export default extractAppLinks
+module.exports = extractAppLinks

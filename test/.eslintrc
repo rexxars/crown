@@ -1,4 +1,8 @@
 {
+  "env": {
+    "node": true,
+    "jest": true
+  },
   "rules": {
     "id-length": 0,
     "no-process-env": 0
