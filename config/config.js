@@ -24,7 +24,6 @@ const defaultConfig = {
   },
 
   // Caching
-  memcached: process.env.MEMCACHED_HOSTS || '',
   defaultCacheTtl: process.env.DEFAULT_CACHE_TTL || 120
 }
 
