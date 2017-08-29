@@ -6,10 +6,10 @@ Microservice that scrapes websites, extracting key information such as title, de
 
 ```
 # Either clone the repository
-git clone https://github.com/bengler/crown.git
+git clone https://github.com/rexxars/crown.git
 
-# Or install it using NPM (don't confuse `crown` with `@bengler/crown`)
-npm install -g @bengler/crown
+# Or install it using NPM (don't confuse `crown` with `@rexxars/crown`)
+npm install -g @rexxars/crown
 
 # Then, install dependencies
 npm install
