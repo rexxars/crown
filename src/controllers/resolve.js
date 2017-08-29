@@ -35,7 +35,9 @@ async function resolve(req, res, next) {
   const usedExtractors = extractAll ? extractorNames : req.query.extract
   const requiresBody = usedExtractors.some(extractor => extractors[extractor].requiresDocumentBody)
 
+  // Try to perform request
   let response
+  let error
   try {
     response = await req.app.services.requester({
       method: 'GET',
@@ -43,13 +45,21 @@ async function resolve(req, res, next) {
       requiresBody: requiresBody
     })
   } catch (err) {
-    next(normalizeError(err))
-    return
+    error = err
   }
 
-  if (response.statusCode >= 300) {
-    next(normalizeError(null, response))
-    return
+  // Handle request errors or upstream errors
+  if (error || response.statusCode >= 300) {
+    error = normalizeError(error, response)
+    if (error instanceof Error || error.isBoom) {
+      next(error)
+      return
+    }
+
+    if (error.code) {
+      res.json({error, statusCode: response && response.statusCode})
+      return
+    }
   }
 
   // Memoize to allow lazy-parsing, yet be efficient when multiple extractors need it

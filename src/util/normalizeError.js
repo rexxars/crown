@@ -12,13 +12,26 @@ const handleHttpError = res => {
     return undefined
   }
 
-  switch (res.statusCode) {
-    case 301:
-      return Boom.create(508, 'Reached maximum number of redirects without resolving')
-    case 404:
-      return Boom.notFound('Remote server responded with a 404')
-    default:
-      return new Error('Unknown HTTP error')
+  if (res.statusCode === 301) {
+    return {
+      code: 'MAX_REDIRECTS_REACHED',
+      message: 'Reached maximum number of redirects without resolving',
+      retryable: false
+    }
+  }
+
+  if (res.statusCode === 404) {
+    return {
+      code: 'REMOTE_URL_NOT_FOUND',
+      message: 'Remote server responded with an HTTP 404 (Not Found)',
+      retryable: false
+    }
+  }
+
+  return {
+    code: 'REMOTE_HTTP_ERROR',
+    message: `Remote server responded with an HTTP ${res.statusCode}`,
+    retryable: true
   }
 }
 
@@ -26,13 +39,29 @@ const handleNodeError = err => {
   // First attempt to use the code (node http/parse errors)
   switch (err.code) {
     case 'ENOTFOUND':
-      return Boom.notFound('Hostname could not be resolved')
+      return {
+        code: 'REMOTE_HOST_NOT_FOUND',
+        message: 'Hostname could not be resolved',
+        retryable: false
+      }
     case 'ECONNRESET':
-      return Boom.serverTimeout(err.message)
+      return {
+        code: 'CONNECTION_RESET',
+        message: 'Connection to remote host was reset',
+        retryable: true
+      }
     case 'ESOCKETTIMEDOUT':
-      return Boom.gatewayTimeout()
+      return {
+        code: 'SOCKET_TIMEOUT',
+        message: 'Connection to remote host timed out',
+        retryable: true
+      }
     case 'ECONNREFUSED':
-      return Boom.badGateway('Remote host refused the connection attempt')
+      return {
+        code: 'REMOTE_HOST_REFUSED_CONNECTION',
+        message: 'Remote host refused the connection attempt',
+        retryable: false
+      }
     default:
       return undefined
   }
@@ -49,7 +78,11 @@ const handleCrownError = err => {
   }
 
   if (err instanceof RequestTimeoutError) {
-    return Boom.serverTimeout(err.message)
+    return {
+      code: 'CONNECTION_TIMEOUT',
+      message: 'Connection to remote host timed out',
+      retryable: true
+    }
   }
 
   return undefined
@@ -58,12 +91,20 @@ const handleCrownError = err => {
 const handleUncaughtError = err => {
   // Some node errors don't have a code, or the code is so cryptic that it is
   // likely to change in the future, for these, we'll try to match on message
-  if (err.message === 'Parse Error') {
-    return Boom.badGateway('Unable to parse response from remote server')
+  if (err.message.includes('Parse Error')) {
+    return {
+      code: 'PARSE_ERROR',
+      message: 'Unable to parse response from remote server',
+      retryable: true
+    }
   }
 
   if (err.message.includes('redirects exceeded')) {
-    return Boom.create(508, 'Reached maximum number of redirects without resolving')
+    return {
+      code: 'MAX_REDIRECTS_REACHED',
+      message: 'Reached maximum number of redirects without resolving',
+      retryable: false
+    }
   }
 
   console.error('Unhandled error type', err) // eslint-disable-line

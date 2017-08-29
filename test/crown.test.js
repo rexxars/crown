@@ -1,5 +1,6 @@
 const qs = require('querystring').stringify
 const os = require('os')
+const omit = require('lodash/omit')
 const request = require('supertest')
 const config = require('../config/config')
 const initServer = require('../src/app')
@@ -11,7 +12,9 @@ const {infiniteRedirectServer, redirectServer} = require('./fixtures/redirectSer
 const app = initServer(config)
 const getBody = res => res.body
 const baseUrl = '/resolve'
-const getUrl = srv => `http://localhost:${srv.address().port}`
+const getFixtureUrl = srv => `http://localhost:${srv.address().port}`
+const getUrl = fixture => `${baseUrl}?${qs({url: getFixtureUrl(fixture)})}`
+const stripUrl = res => omit(res, 'resolvedUrl')
 
 test('requires a URL query param', () =>
   request(app).get(baseUrl).send().expect(400, {
@@ -21,51 +24,36 @@ test('requires a URL query param', () =>
     validation: {source: 'query', keys: ['url']}
   }))
 
-test('extracts meta and opengraph info by default', () =>
-  successServer().then(fixture =>
-    request(app).get(`${baseUrl}?${qs({url: getUrl(fixture)})}`).then(res => {
-      const doc = getBody(res)
-      expect(res.statusCode).toBe(200, 'status code should be 200')
-      expect(doc.statusCode).toBe(200, 'status code should be 200')
-      expect(doc.resolvedUrl).toBe(`${getUrl(fixture)}/`)
-      expect(doc.meta.title).toBe('Beginning Assembly Programming on the Commodore Vic-20')
-      expect(doc.meta.description).toBe('Retro Computers, Programming, General Technical Tinkering')
-      expect(doc.openGraph.description).toBe(
-        'Retro Computers, Programming, General Technical Tinkering'
-      )
-      expect(doc.openGraph.url).toBe(
-        'http://techtinkering.com/2013/04/16/beginning-assembly-programming-on-the-commodore-vic-20/'
-      )
+test('extracts meta and opengraph info by default', async () => {
+  const fixture = await successServer()
+  const response = await request(app).get(getUrl(fixture))
 
-      fixture.close()
-    })
-  ))
+  expect(stripUrl(response.body)).toMatchSnapshot()
+  return fixture.close()
+})
 
 test('stops after max number of redirects', () =>
   infiniteRedirectServer().then(fixture =>
-    request(app).get(`${baseUrl}?${qs({url: getUrl(fixture)})}`).then(res => {
-      const doc = getBody(res)
-      expect(res.statusCode).toBe(508, 'status code should be 508')
-      expect(doc.statusCode).toBe(508, 'status code should be 508')
-      expect(doc.message).toBe('Reached maximum number of redirects without resolving')
-      fixture.close()
-    })
+    request(app)
+      .get(`${baseUrl}?${qs({url: getFixtureUrl(fixture)})}`)
+      .then(res => expect(stripUrl(res.body)).toMatchSnapshot())
+      .then(() => fixture.close())
   ))
 
 test('handles redirects within limit', () =>
   redirectServer().then(fixture =>
-    request(app).get(`${baseUrl}?${qs({url: getUrl(fixture)})}`).then(res => {
+    request(app).get(`${baseUrl}?${qs({url: getFixtureUrl(fixture)})}`).then(res => {
       const doc = getBody(res)
       expect(res.statusCode).toBe(200, 'status code should be 200')
       expect(doc.statusCode).toBe(200, 'status code should be 200')
-      expect(doc.resolvedUrl).toBe(`${getUrl(fixture)}/home`)
+      expect(doc.resolvedUrl).toBe(`${getFixtureUrl(fixture)}/home`)
       fixture.close()
     })
   ))
 
 test.skip('cuts responses at size limit', () =>
   largeBodyServer().then(fixture =>
-    request(app).get(`${baseUrl}?${qs({url: getUrl(fixture)})}`).then(res => {
+    request(app).get(`${baseUrl}?${qs({url: getFixtureUrl(fixture)})}`).then(res => {
       const doc = getBody(res)
       expect(res.statusCode).toBe(406, 'status code should be 406')
       expect(doc.statusCode).toBe(406, 'status code should be 406')
@@ -75,46 +63,40 @@ test.skip('cuts responses at size limit', () =>
   )
 )
 
-test.only('cuts responses at timeout', () =>
+test('cuts responses at timeout', () =>
   timeoutServer().then(fixture =>
-    request(app).get(`${baseUrl}?${qs({url: getUrl(fixture)})}`).then(res => {
-      const doc = getBody(res)
-      expect(res.statusCode).toBe(503, 'status code should be 503')
-      expect(doc.statusCode).toBe(503, 'status code should be 503')
-      expect(doc.message).toBe('Read timeout while fetching URL')
-      fixture.close()
-    })
-  )
-)
+    request(app)
+      .get(`${baseUrl}?${qs({url: getFixtureUrl(fixture)})}`)
+      .then(res => expect(stripUrl(res.body)).toMatchSnapshot())
+      .then(() => fixture.close())
+  ))
 
-/*
 test('does not allow connections to local hosts', () => {
-  const tmpServer = initServer(Object.assign({}, config, {allowPrivateHostnames: false}))
+  const tmpApp = initServer(Object.assign({}, config, {allowPrivateHostnames: false}))
 
   return Promise.all([
-    tmprequest(app).get(`${baseUrl}?${qs({url: 'http://127.0.0.1'})}`).then(res => {
+    request(tmpApp).get(`${baseUrl}?${qs({url: 'http://127.0.0.1'})}`).then(res => {
       expect(res.statusCode).toBe(403, 'status code should be 403')
     }),
 
-    tmprequest(app).get(`${baseUrl}?${qs({url: 'http://localhost:8080'})}`).then(res => {
+    request(tmpApp).get(`${baseUrl}?${qs({url: 'http://localhost:8080'})}`).then(res => {
       expect(res.statusCode).toBe(403, 'status code should be 403')
     }),
 
-    tmprequest(app).get(`${baseUrl}?${qs({url: `http://${os.hostname()}`})}`).then(res => {
+    request(tmpApp).get(`${baseUrl}?${qs({url: `http://${os.hostname()}`})}`).then(res => {
       expect(res.statusCode).toBe(403, 'status code should be 403')
     }),
 
-    tmprequest(app).get(`${baseUrl}?${qs({url: `http://192.168.1.44`})}`).then(res => {
+    request(tmpApp).get(`${baseUrl}?${qs({url: `http://192.168.1.44`})}`).then(res => {
       expect(res.statusCode).toBe(403, 'status code should be 403')
     })
   ])
 })
 
 test('allow connections to remote hosts', () => {
-  const tmpServer = initServer(Object.assign({}, config, {allowPrivateHostnames: false}))
+  const tmpApp = initServer(Object.assign({}, config, {allowPrivateHostnames: false}))
 
-  return tmprequest(app).get(`${baseUrl}?${qs({url: 'http://www.google.com'})}`).then(res => {
+  return request(tmpApp).get(`${baseUrl}?${qs({url: 'http://www.google.com'})}`).then(res => {
     expect(res.statusCode).toBe(200, 'status code should be 200')
   })
 })
-*/

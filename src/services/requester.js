@@ -1,10 +1,10 @@
 const getIt = require('get-it')
 const Boom = require('boom')
 const {sample} = require('lodash')
-const {retry, debug, promise} = require('get-it/middleware')
+const {debug, promise} = require('get-it/middleware')
 const urlIsPrivate = require('./urlIsPrivate')
 
-const request = getIt([retry({maxRetries: 3}), debug({verbose: true}), promise()])
+const request = getIt([debug({verbose: true}), promise()])
 
 const getDefaultOptions = config => ({
   headers: {

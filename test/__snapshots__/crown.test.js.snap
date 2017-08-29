@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`cuts responses at timeout 1`] = `
+Object {
+  "error": Object {
+    "code": "SOCKET_TIMEOUT",
+    "message": "Connection to remote host timed out",
+    "retryable": true,
+  },
+}
+`;
+
+exports[`extracts meta and opengraph info by default 1`] = `
+Object {
+  "meta": Object {
+    "description": "Retro Computers, Programming, General Technical Tinkering",
+    "title": "Beginning Assembly Programming on the Commodore Vic-20",
+  },
+  "openGraph": Object {
+    "description": "Retro Computers, Programming, General Technical Tinkering",
+    "url": "http://techtinkering.com/2013/04/16/beginning-assembly-programming-on-the-commodore-vic-20/",
+  },
+  "statusCode": 200,
+}
+`;
+
+exports[`stops after max number of redirects 1`] = `
+Object {
+  "error": Object {
+    "code": "MAX_REDIRECTS_REACHED",
+    "message": "Reached maximum number of redirects without resolving",
+    "retryable": false,
+  },
+}
+`;
