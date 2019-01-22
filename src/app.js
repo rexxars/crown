@@ -1,6 +1,6 @@
 const cors = require('cors')
 const express = require('express')
-const celebrate = require('celebrate')
+const {errors} = require('celebrate')
 const defaultsDeep = require('lodash/defaultsDeep')
 const defaultConfig = require('../config/config')
 const logger = require('./services/logger')
@@ -25,7 +25,7 @@ module.exports = conf => {
   app.use('/resolve', require('./controllers/resolve'))
 
   // Error handling middlewares
-  app.use(celebrate.errors())
+  app.use(errors())
   app.use(errorHandler)
 
   return app

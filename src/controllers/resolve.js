@@ -1,6 +1,5 @@
-const Joi = require('joi')
 const cheerio = require('cheerio')
-const celebrate = require('celebrate')
+const {Joi, celebrate} = require('celebrate')
 const {memoize} = require('lodash')
 const express = require('express')
 const openGraph = require('../extractors/openGraph')
@@ -18,11 +17,20 @@ router.get(
   '/',
   celebrate({
     query: Joi.object().keys({
-      url: Joi.string().required().uri({scheme: ['http', 'https']}),
-      maxRedirects: Joi.number().integer().min(0).max(10),
+      url: Joi.string()
+        .required()
+        .uri({scheme: ['http', 'https']}),
+      maxRedirects: Joi.number()
+        .integer()
+        .min(0)
+        .max(10),
       extract: Joi.array()
         .single()
-        .items(Joi.string().valid(extractorNames).allow('*'))
+        .items(
+          Joi.string()
+            .valid(extractorNames)
+            .allow('*')
+        )
         .default(['meta', 'openGraph'])
     })
   }),
