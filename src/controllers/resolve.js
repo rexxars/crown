@@ -31,7 +31,8 @@ router.get(
             .valid(extractorNames)
             .allow('*')
         )
-        .default(['meta', 'openGraph'])
+        .default(['meta', 'openGraph']),
+      tag: Joi.string()
     })
   }),
   resolve
