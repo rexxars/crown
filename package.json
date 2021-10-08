@@ -1,6 +1,6 @@
 {
   "name": "@rexxars/crown",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Microservice that scrapes websites, extracting key information such as title, description, opengraph information etc",
   "main": "src/app.js",
   "scripts": {
