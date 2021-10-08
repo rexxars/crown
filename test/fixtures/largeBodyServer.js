@@ -2,12 +2,11 @@ const createServer = require('./createServer')
 const {readFileSync} = require('fs')
 const {join} = require('path')
 
-module.exports = cb =>
+module.exports = (cb) =>
   createServer(
     (req, res) => {
       let chunks = 0
-      const preamble = new Buffer(128000)
-      preamble.fill(' ')
+      const preamble = Buffer.alloc(128000, ' ')
 
       const sendChunk = () => {
         res.write(preamble)

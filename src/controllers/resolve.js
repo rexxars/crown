@@ -1,5 +1,5 @@
 const cheerio = require('cheerio')
-const {Joi, celebrate} = require('celebrate')
+const {Joi, celebrate, Segments} = require('celebrate')
 const {memoize} = require('lodash')
 const express = require('express')
 const openGraph = require('../extractors/openGraph')
@@ -16,24 +16,21 @@ const router = express.Router()
 router.get(
   '/',
   celebrate({
-    query: Joi.object().keys({
+    [Segments.QUERY]: Joi.object().keys({
       url: Joi.string()
         .required()
         .uri({scheme: ['http', 'https']}),
-      maxRedirects: Joi.number()
-        .integer()
-        .min(0)
-        .max(10),
+      maxRedirects: Joi.number().integer().min(0).max(10),
       extract: Joi.array()
         .single()
         .items(
           Joi.string()
-            .valid(extractorNames)
+            .valid(...extractorNames)
             .allow('*')
         )
         .default(['meta', 'openGraph']),
-      tag: Joi.string()
-    })
+      tag: Joi.string(),
+    }),
   }),
   resolve
 )
@@ -42,7 +39,9 @@ async function resolve(req, res, next) {
   // If the string value `*` is in the extract array, treat it as "extract everything"
   const extractAll = req.query.extract.includes('*')
   const usedExtractors = extractAll ? extractorNames : req.query.extract
-  const requiresBody = usedExtractors.some(extractor => extractors[extractor].requiresDocumentBody)
+  const requiresBody = usedExtractors.some(
+    (extractor) => extractors[extractor].requiresDocumentBody
+  )
 
   // Try to perform request
   let response
@@ -51,7 +50,7 @@ async function resolve(req, res, next) {
     response = await req.app.services.requester({
       method: 'GET',
       url: req.query.url,
-      requiresBody: requiresBody
+      requiresBody: requiresBody,
     })
   } catch (err) {
     error = err
@@ -89,7 +88,7 @@ async function resolve(req, res, next) {
     },
     {
       statusCode: response.statusCode,
-      resolvedUrl: response.url
+      resolvedUrl: response.url,
     }
   )
 

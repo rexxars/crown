@@ -10,4 +10,4 @@ const handler = (req, res) => {
   }, 3000)
 }
 
-module.exports = cb => createServer(handler, 'http', cb)
+module.exports = (cb) => createServer(handler, 'http', cb)

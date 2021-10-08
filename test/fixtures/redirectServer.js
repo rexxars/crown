@@ -2,7 +2,7 @@ const createServer = require('./createServer')
 
 let i = 0
 
-exports.infiniteRedirectServer = cb =>
+exports.infiniteRedirectServer = (cb) =>
   createServer(
     (req, res) => {
       res.writeHead(301, {Location: `/${++i}`})
@@ -12,7 +12,7 @@ exports.infiniteRedirectServer = cb =>
     cb
   )
 
-exports.redirectServer = cb =>
+exports.redirectServer = (cb) =>
   createServer(
     (req, res) => {
       if (req.url === '/') {

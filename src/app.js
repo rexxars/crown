@@ -7,13 +7,13 @@ const logger = require('./services/logger')
 const requester = require('./services/requester')
 const errorHandler = require('./middleware/errorHandler')
 
-module.exports = conf => {
+module.exports = (conf) => {
   // Init services with passed config
   const config = defaultsDeep({}, conf, defaultConfig)
   const app = express()
   app.services = {
     logger: config.logger || logger(config),
-    requester: requester(config)
+    requester: requester(config),
   }
 
   if (config.cors.enabled) {

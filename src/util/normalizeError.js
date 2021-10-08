@@ -1,13 +1,8 @@
 const Boom = require('boom')
-const {
-  DisallowedHostError,
-  MaxAllowedBytesExceededError,
-  RequestTimeoutError
-} = require('../errors')
 
-const isNotHttpOk = res => res && res.statusCode >= 300
+const isNotHttpOk = (res) => res && res.statusCode >= 300
 
-const handleHttpError = res => {
+const handleHttpError = (res) => {
   if (!res || !isNotHttpOk(res)) {
     return undefined
   }
@@ -16,7 +11,7 @@ const handleHttpError = res => {
     return {
       code: 'MAX_REDIRECTS_REACHED',
       message: 'Reached maximum number of redirects without resolving',
-      retryable: false
+      retryable: false,
     }
   }
 
@@ -24,78 +19,78 @@ const handleHttpError = res => {
     return {
       code: 'REMOTE_URL_NOT_FOUND',
       message: 'Remote server responded with an HTTP 404 (Not Found)',
-      retryable: false
+      retryable: false,
     }
   }
 
   return {
     code: 'REMOTE_HTTP_ERROR',
     message: `Remote server responded with an HTTP ${res.statusCode}`,
-    retryable: true
+    retryable: true,
   }
 }
 
-const handleNodeError = err => {
+const handleNodeError = (err) => {
   // First attempt to use the code (node http/parse errors)
   switch (err.code) {
     case 'ENOTFOUND':
       return {
         code: 'REMOTE_HOST_NOT_FOUND',
         message: 'Hostname could not be resolved',
-        retryable: false
+        retryable: false,
       }
     case 'ECONNRESET':
       return {
         code: 'CONNECTION_RESET',
         message: 'Connection to remote host was reset',
-        retryable: true
+        retryable: true,
       }
     case 'ESOCKETTIMEDOUT':
       return {
         code: 'SOCKET_TIMEOUT',
         message: 'Connection to remote host timed out',
-        retryable: true
+        retryable: true,
       }
     case 'ECONNREFUSED':
       return {
         code: 'REMOTE_HOST_REFUSED_CONNECTION',
         message: 'Remote host refused the connection attempt',
-        retryable: false
+        retryable: false,
       }
     default:
       return undefined
   }
 }
 
-const handleCrownError = err => {
+const handleCrownError = (err) => {
   // Crown-initiated error?
-  if (err instanceof DisallowedHostError) {
+  if (err.type === 'DisallowedHostError') {
     return Boom.forbidden('Hostname of URL is forbidden (blacklisted)')
   }
 
-  if (err instanceof MaxAllowedBytesExceededError) {
+  if (err.type === 'MaxAllowedBytesExceededError') {
     return Boom.notAcceptable('Response exceeded max allowed number of bytes')
   }
 
-  if (err instanceof RequestTimeoutError) {
+  if (err.type === 'RequestTimeoutError') {
     return {
       code: 'CONNECTION_TIMEOUT',
       message: 'Connection to remote host timed out',
-      retryable: true
+      retryable: true,
     }
   }
 
   return undefined
 }
 
-const handleUncaughtError = err => {
+const handleUncaughtError = (err) => {
   // Some node errors don't have a code, or the code is so cryptic that it is
   // likely to change in the future, for these, we'll try to match on message
   if (err.message.includes('Parse Error')) {
     return {
       code: 'PARSE_ERROR',
       message: 'Unable to parse response from remote server',
-      retryable: true
+      retryable: true,
     }
   }
 
@@ -103,7 +98,7 @@ const handleUncaughtError = err => {
     return {
       code: 'MAX_REDIRECTS_REACHED',
       message: 'Reached maximum number of redirects without resolving',
-      retryable: false
+      retryable: false,
     }
   }
 
@@ -111,7 +106,7 @@ const handleUncaughtError = err => {
   return Boom.badImplementation('Unhandled error type')
 }
 
-const handleBoomError = err => {
+const handleBoomError = (err) => {
   if (err.isBoom) {
     return err
   }

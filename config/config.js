@@ -36,7 +36,7 @@ const testConfig = {
 }
 
 const isTest = typeof __TEST__ !== 'undefined'
-const config = Object.assign({}, defaultConfig, isTest ? testConfig : {})
+const config = {...defaultConfig, ...(isTest ? testConfig : {})}
 
 function boolify(envVar, defValue) {
   if (typeof envVar === 'undefined') {
